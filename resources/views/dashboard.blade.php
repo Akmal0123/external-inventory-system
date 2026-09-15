@@ -1548,14 +1548,16 @@
             data.items = [];
             let valid = true;
             itemRows.forEach(row => {
-                const sel    = row.querySelector('select');
-                const qtyEl  = row.querySelector('input[type="number"]:nth-of-type(1)');
-                const priceEl= row.querySelector('input[type="number"]:nth-of-type(2)');
+                const sel     = row.querySelector('select');
+                // Extract idx from row id (format: pr-row-{idx})
+                const rowIdx  = row.id.replace('pr-row-', '');
+                const qtyEl   = document.getElementById('pr-qty-' + rowIdx);
+                const priceEl = document.getElementById('pr-price-' + rowIdx);
                 if (!sel?.value) { valid = false; return; }
                 data.items.push({
                     item_id: parseInt(sel.value),
-                    quantity: parseInt(qtyEl.value),
-                    estimated_price: parseFloat(priceEl.value)
+                    quantity: parseInt(qtyEl?.value || 1),
+                    estimated_price: parseFloat(priceEl?.value || 0)
                 });
             });
 
@@ -1608,13 +1610,15 @@
             let valid = true;
             itemRows.forEach(row => {
                 const sel     = row.querySelector('select');
-                const qtyEl   = row.querySelector('input[type="number"]:nth-of-type(1)');
-                const upriceEl= row.querySelector('input[type="number"]:nth-of-type(2)');
+                // Extract idx from row id (format: po-row-{idx})
+                const rowIdx  = row.id.replace('po-row-', '');
+                const qtyEl   = document.getElementById('po-qty-' + rowIdx);
+                const upriceEl= document.getElementById('po-uprice-' + rowIdx);
                 if (!sel?.value) { valid = false; return; }
                 data.items.push({
                     item_id: parseInt(sel.value),
-                    quantity: parseInt(qtyEl.value),
-                    unit_price: parseFloat(upriceEl.value)
+                    quantity: parseInt(qtyEl?.value || 1),
+                    unit_price: parseFloat(upriceEl?.value || 0)
                 });
             });
 

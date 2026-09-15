@@ -110,7 +110,10 @@ class PurchaseOrderController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $po = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest', 'items.item'])->find($id);
+        $po = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest', 'items.item'])
+            ->where('id', $id)
+            ->orWhere('po_number', $id)
+            ->first();
 
         if (!$po) {
             return $this->errorResponse('Purchase Order tidak ditemukan', 404);
@@ -284,7 +287,10 @@ class PurchaseOrderController extends Controller
      */
     public function pdf(string $id): Response|JsonResponse
     {
-        $po = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest', 'items.item'])->find($id);
+        $po = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest', 'items.item'])
+            ->where('id', $id)
+            ->orWhere('po_number', $id)
+            ->first();
 
         if (!$po) {
             return $this->errorResponse('Purchase Order tidak ditemukan', 404);

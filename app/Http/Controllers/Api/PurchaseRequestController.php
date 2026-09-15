@@ -93,7 +93,10 @@ class PurchaseRequestController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $pr = PurchaseRequest::with(['company', 'items.item'])->find($id);
+        $pr = PurchaseRequest::with(['company', 'items.item'])
+            ->where('id', $id)
+            ->orWhere('pr_number', $id)
+            ->first();
 
         if (!$pr) {
             return $this->errorResponse('Purchase Request tidak ditemukan', 404);
