@@ -26,7 +26,7 @@ class DashboardController extends Controller
             'approved_prs_count' => PurchaseRequest::where('status', 'approved')->count(),
         ];
 
-        $recentPOs = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest'])
+        $recentPOs = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest', 'items.item'])
             ->latest('id')
             ->take(10)
             ->get();

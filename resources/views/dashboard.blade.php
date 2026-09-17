@@ -505,6 +505,142 @@
             animation: modalFadeIn 0.2s ease-out;
         }
 
+        .modal-lg {
+            max-width: 900px;
+        }
+
+        .po-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        @media (max-width: 680px) {
+            .po-meta-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .po-info-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+        }
+
+        .po-info-card-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .po-details-strip {
+            display: flex;
+            gap: 16px;
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .po-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .po-detail-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .po-detail-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .detail-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .detail-items-table th {
+            background: #f8fafc;
+            padding: 10px 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-items-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .detail-items-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .po-summary-container {
+            margin-top: 14px;
+            margin-left: auto;
+            max-width: 340px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+        }
+
+        .po-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        .po-summary-row strong {
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .po-summary-total {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 14.5px;
+            color: var(--text-main);
+        }
+
+        .po-summary-total strong {
+            color: var(--primary);
+            font-size: 16.5px;
+            font-weight: 800;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @keyframes modalFadeIn {
             from { opacity: 0; transform: translateY(10px) scale(0.98); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -842,11 +978,12 @@
                                 </td>
                                 <td style="text-align: center;">
                                     <div style="display: inline-flex; gap: 6px;">
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="showPoDetail({{ $po->id }})" title="View Detail Purchase Order">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1.5px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                            View Detail
+                                        </button>
                                         <a href="/api/purchase-orders/{{ $po->id }}" target="_blank" class="btn btn-secondary btn-sm" title="Lihat JSON API">
                                             JSON API
-                                        </a>
-                                        <a href="/api/purchase-orders/{{ $po->id }}/pdf" target="_blank" class="btn btn-primary btn-sm" title="Download atau Preview PDF">
-                                            Download PDF
                                         </a>
                                     </div>
                                 </td>
@@ -1248,6 +1385,134 @@
         </div>
     </div>
 
+    <!-- Modal Detail & Preview Purchase Order -->
+    <div id="modal-po-detail" class="modal-backdrop">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700;">Purchase Order Detail</div>
+                        <h3 id="po-detail-title" style="margin-top: 2px; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                            <span id="po-detail-number">PO-XXXX-XXXX</span>
+                            <span id="po-detail-status-badge" class="status-badge status-draft">DRAFT</span>
+                        </h3>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeModal('modal-po-detail')">&times;</button>
+            </div>
+            
+            <div class="modal-body" id="po-detail-body">
+                <!-- Loading indicator -->
+                <div id="po-detail-loading" style="display: none; text-align: center; padding: 40px; color: var(--text-muted);">
+                    <div style="display: inline-block; width: 28px; height: 28px; border: 3px solid rgba(79, 70, 229, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;"></div>
+                    <div>Memuat detail Purchase Order...</div>
+                </div>
+
+                <div id="po-detail-content">
+                    <!-- Top Meta Cards -->
+                    <div class="po-meta-grid">
+                        <!-- Company Box -->
+                        <div class="po-info-card">
+                            <div class="po-info-card-header">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/><path d="M14 9h1"/><path d="M14 13h1"/><path d="M14 17h1"/></svg>
+                                <span>Perusahaan Pemesan (Company)</span>
+                            </div>
+                            <div class="po-info-card-body">
+                                <div style="font-weight: 700; font-size: 14px; color: var(--text-main);" id="po-detail-company-name">-</div>
+                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="po-detail-company-address">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Vendor Box -->
+                        <div class="po-info-card">
+                            <div class="po-info-card-header">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                <span>Vendor / Supplier Rekanan</span>
+                            </div>
+                            <div class="po-info-card-body">
+                                <div style="font-weight: 700; font-size: 14px; color: var(--text-main);" id="po-detail-vendor-name">-</div>
+                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="po-detail-vendor-address">-</div>
+                                <div style="font-size: 12px; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 12px; color: var(--text-muted);">
+                                    <span id="po-detail-vendor-phone">Telp: -</span>
+                                    <span id="po-detail-vendor-email">Email: -</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Details Strip -->
+                    <div class="po-details-strip">
+                        <div class="po-detail-item">
+                            <span class="po-detail-label">Tanggal Order</span>
+                            <span class="po-detail-value" id="po-detail-date">-</span>
+                        </div>
+                        <div class="po-detail-item">
+                            <span class="po-detail-label">Ref. Purchase Request</span>
+                            <span class="po-detail-value" id="po-detail-pr" style="color: var(--primary);">-</span>
+                        </div>
+                        <div class="po-detail-item" style="flex: 2; min-width: 200px;">
+                            <span class="po-detail-label">Keterangan / Deskripsi</span>
+                            <span class="po-detail-value" id="po-detail-description" style="font-weight: normal; color: var(--text-muted);">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Items Section -->
+                    <div style="margin-top: 16px;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Daftar Item Barang</span>
+                            <span id="po-detail-items-count" style="font-size: 11px; background: #f1f5f9; border: 1px solid var(--border-color); padding: 2px 8px; border-radius: 9999px; font-weight: 600;">0 item</span>
+                        </div>
+                        <div style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px;">
+                            <table class="detail-items-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px; text-align: center;">#</th>
+                                        <th>Barang & Deskripsi</th>
+                                        <th style="text-align: center; width: 90px;">Qty</th>
+                                        <th style="text-align: right; width: 140px;">Harga Satuan</th>
+                                        <th style="text-align: right; width: 150px;">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="po-detail-items-body">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Financial Summary Box -->
+                    <div class="po-summary-container">
+                        <div class="po-summary-row">
+                            <span>Subtotal:</span>
+                            <strong id="po-detail-subtotal">Rp 0</strong>
+                        </div>
+                        <div class="po-summary-row">
+                            <span>Pajak (Tax):</span>
+                            <strong id="po-detail-tax">Rp 0</strong>
+                        </div>
+                        <div class="po-summary-row po-summary-total">
+                            <span>Total Nilai PO:</span>
+                            <strong id="po-detail-total">Rp 0</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="justify-content: space-between;">
+                <div style="display: flex; gap: 8px;">
+                    <a id="po-detail-pdf-btn" href="#" target="_blank" class="btn btn-primary" title="Buka / Download PDF">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        Download PDF
+                    </a>
+                    <a id="po-detail-json-btn" href="#" target="_blank" class="btn btn-secondary" title="Buka Response JSON API">
+                        JSON API
+                    </a>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modal-po-detail')">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Tambah Barang -->
     <div id="modal-item" class="modal-backdrop">
         <div class="modal">
@@ -1338,12 +1603,57 @@
             'unit'  => $i->unit,
         ];
     })->values()->toJson();
+
+    $recentPosJson = $recentPOs->mapWithKeys(function ($po) {
+        return [$po->id => [
+            'id' => $po->id,
+            'po_number' => $po->po_number,
+            'purchase_request' => $po->purchaseRequest ? [
+                'id' => $po->purchaseRequest->id,
+                'pr_number' => $po->purchaseRequest->pr_number,
+            ] : null,
+            'company' => $po->company ? [
+                'id' => $po->company->id,
+                'code' => $po->company->code,
+                'name' => $po->company->name,
+                'address' => $po->company->address,
+            ] : null,
+            'vendor' => $po->vendor ? [
+                'id' => $po->vendor->id,
+                'code' => $po->vendor->code,
+                'name' => $po->vendor->name,
+                'address' => $po->vendor->address,
+                'phone' => $po->vendor->phone,
+                'email' => $po->vendor->email,
+            ] : null,
+            'order_date' => $po->order_date?->format('d/m/Y') ?? '-',
+            'raw_order_date' => $po->order_date?->format('Y-m-d') ?? '',
+            'status' => $po->status,
+            'description' => $po->description,
+            'subtotal' => (float) $po->subtotal,
+            'tax' => (float) $po->tax,
+            'total' => (float) $po->total,
+            'items' => $po->items->map(function ($it) {
+                return [
+                    'id' => $it->id,
+                    'item_code' => $it->item?->code ?? '-',
+                    'item_name' => $it->item?->name ?? 'Barang',
+                    'unit' => $it->item?->unit ?? 'unit',
+                    'quantity' => (int) $it->quantity,
+                    'unit_price' => (float) $it->unit_price,
+                    'subtotal' => (float) $it->subtotal,
+                    'description' => $it->description,
+                ];
+            })->values(),
+        ]];
+    })->toJson();
 @endphp
     <script>
         // =====================
         // Master data from Blade
         // =====================
         const ITEMS_MASTER = {!! $itemsMasterJson !!};
+        const RECENT_POS_MAP = {!! $recentPosJson !!};
 
         // =====================
         // Toast Notification
@@ -1741,6 +2051,117 @@
             } catch (err) {
                 alert('Terjadi kesalahan: ' + err.message);
             }
+        }
+
+        // =====================
+        // PO Detail Modal Preview
+        // =====================
+        async function showPoDetail(poId) {
+            openModal('modal-po-detail');
+            
+            const loading = document.getElementById('po-detail-loading');
+            const content = document.getElementById('po-detail-content');
+            
+            // If available in server-rendered map, show immediately
+            if (RECENT_POS_MAP && RECENT_POS_MAP[poId]) {
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                renderPoDetail(RECENT_POS_MAP[poId]);
+                return;
+            }
+
+            // Otherwise fetch dynamically from API
+            loading.style.display = 'block';
+            content.style.display = 'none';
+            try {
+                const res = await fetch('/api/purchase-orders/' + poId, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) throw new Error('HTTP status ' + res.status);
+                const result = await res.json();
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                renderPoDetail(result.data);
+            } catch (err) {
+                loading.innerHTML = `
+                    <div style="color: var(--danger); padding: 24px; text-align: center;">
+                        <div style="font-weight: 700; margin-bottom: 6px;">Gagal memuat detail Purchase Order</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">${err.message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPoDetail(po) {
+            if (!po) return;
+
+            document.getElementById('po-detail-number').innerText = po.po_number || '-';
+            
+            const statusBadge = document.getElementById('po-detail-status-badge');
+            const status = (po.status || 'draft').toLowerCase();
+            statusBadge.className = 'status-badge status-' + status;
+            statusBadge.innerText = status.toUpperCase();
+
+            // Company info
+            const comp = po.company || {};
+            document.getElementById('po-detail-company-name').innerText = comp.code ? `${comp.code} — ${comp.name || ''}` : (comp.name || '-');
+            document.getElementById('po-detail-company-address').innerText = comp.address || 'Alamat tidak tersedia';
+
+            // Vendor info
+            const vnd = po.vendor || {};
+            document.getElementById('po-detail-vendor-name').innerText = vnd.code ? `${vnd.code} — ${vnd.name || ''}` : (vnd.name || '-');
+            document.getElementById('po-detail-vendor-address').innerText = vnd.address || 'Alamat tidak tersedia';
+            document.getElementById('po-detail-vendor-phone').innerText = 'Telp: ' + (vnd.phone || '-');
+            document.getElementById('po-detail-vendor-email').innerText = 'Email: ' + (vnd.email || '-');
+
+            // Date & PR & Description
+            document.getElementById('po-detail-date').innerText = po.order_date || po.raw_order_date || '-';
+            document.getElementById('po-detail-pr').innerText = po.purchase_request?.pr_number || '-';
+            document.getElementById('po-detail-description').innerText = po.description || '-';
+
+            // Items breakdown
+            const items = po.items || [];
+            document.getElementById('po-detail-items-count').innerText = items.length + ' item';
+            const tbody = document.getElementById('po-detail-items-body');
+            
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Tidak ada item tercatat dalam Purchase Order ini.</td></tr>`;
+            } else {
+                tbody.innerHTML = items.map((it, idx) => {
+                    const itemName = it.item_name || it.name || 'Barang';
+                    const itemCode = it.item_code || it.code || '-';
+                    const unit = it.unit || 'unit';
+                    const qty = it.quantity || 0;
+                    const price = parseFloat(it.unit_price || 0);
+                    const subtotal = parseFloat(it.subtotal || (qty * price));
+                    const desc = it.description ? `<div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">${it.description}</div>` : '';
+
+                    return `
+                        <tr>
+                            <td style="text-align: center; color: var(--text-muted); font-size: 12px;">${idx + 1}</td>
+                            <td>
+                                <div><strong style="color: var(--text-main);">${itemName}</strong> <code style="font-size: 11px; background: #eef2ff; color: #4338ca; padding: 2px 6px; border-radius: 4px; font-weight: 600;">${itemCode}</code></div>
+                                ${desc}
+                            </td>
+                            <td style="text-align: center; font-weight: 600;">${qty} <span style="font-size: 11.5px; color: var(--text-muted); font-weight: normal;">${unit}</span></td>
+                            <td style="text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 12.5px;">Rp ${formatNumber(price)}</td>
+                            <td style="text-align: right; font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--primary);">Rp ${formatNumber(subtotal)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Financial Summary
+            const subtotal = parseFloat(po.subtotal || 0);
+            const tax = parseFloat(po.tax || 0);
+            const total = parseFloat(po.total || (subtotal + tax));
+            document.getElementById('po-detail-subtotal').innerText = 'Rp ' + formatNumber(subtotal);
+            document.getElementById('po-detail-tax').innerText = 'Rp ' + formatNumber(tax);
+            document.getElementById('po-detail-total').innerText = 'Rp ' + formatNumber(total);
+
+            // Action Links in modal footer
+            document.getElementById('po-detail-pdf-btn').href = '/api/purchase-orders/' + po.id + '/pdf';
+            document.getElementById('po-detail-json-btn').href = '/api/purchase-orders/' + po.id;
         }
     </script>
 </body>
