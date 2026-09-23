@@ -20,11 +20,11 @@ class OptionalApiAuth
             return $next($request);
         }
 
-        // If enabled, verify bearer token via Sanctum
-        if (!auth('sanctum')->check()) {
+        // If enabled, verify bearer token via Sanctum or authenticated web session
+        if (!auth('sanctum')->check() && !auth()->guard('web')->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized',
+                'message' => 'Unauthorized: Silakan login terlebih dahulu.',
             ], 401);
         }
 

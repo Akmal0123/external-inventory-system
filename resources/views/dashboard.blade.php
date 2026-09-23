@@ -856,9 +856,18 @@
             <div class="badge-pill">
                 <strong>Port:</strong> 9000
             </div>
-            <div class="badge-pill">
-                <strong>API Prefix:</strong> /api
+            @auth
+            <div class="badge-pill" style="background: rgba(79, 70, 229, 0.08); border-color: rgba(79, 70, 229, 0.25); color: #4338ca;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-2px; margin-right: 4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>{{ Auth::user()->name }} ({{ Auth::user()->email }})</span>
             </div>
+            <form action="{{ url('/logout') }}" method="POST" style="display: inline-block;">
+                @csrf
+                <button type="submit" class="btn btn-secondary btn-sm" style="padding: 6px 14px; font-weight: 700; color: #dc2626; border-color: #fecaca; background: #ffffff; border-radius: 9999px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#ffffff'">
+                    Logout
+                </button>
+            </form>
+            @endauth
         </div>
     </nav>
 
@@ -1650,6 +1659,27 @@
 @endphp
     <script>
         // =====================
+        // Auth Token Persistence
+        // =====================
+        @if(session('api_token'))
+            localStorage.setItem('eis_token', '{{ session('api_token') }}');
+        @endif
+
+        function getAuthHeaders(extra = {}) {
+            const token = localStorage.getItem('eis_token');
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                ...extra
+            };
+            if (token) {
+                headers['Authorization'] = 'Bearer ' + token;
+            }
+            return headers;
+        }
+
+        // =====================
         // Master data from Blade
         // =====================
         const ITEMS_MASTER = {!! $itemsMasterJson !!};
@@ -1879,7 +1909,8 @@
             try {
                 const res = await fetch('/api/purchase-requests', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    headers: getAuthHeaders(),
+                    credentials: 'same-origin',
                     body: JSON.stringify(data)
                 });
                 const result = await res.json();
@@ -1942,7 +1973,8 @@
             try {
                 const res = await fetch('/api/purchase-orders', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    headers: getAuthHeaders(),
+                    credentials: 'same-origin',
                     body: JSON.stringify(data)
                 });
                 const result = await res.json();
@@ -2004,10 +2036,8 @@
             try {
                 const res = await fetch('/api/items', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
+                    credentials: 'same-origin',
                     body: JSON.stringify(data)
                 });
 
@@ -2033,10 +2063,8 @@
             try {
                 const res = await fetch('/api/vendors', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
+                    headers: getAuthHeaders(),
+                    credentials: 'same-origin',
                     body: JSON.stringify(data)
                 });
 
@@ -2075,7 +2103,8 @@
             content.style.display = 'none';
             try {
                 const res = await fetch('/api/purchase-orders/' + poId, {
-                    headers: { 'Accept': 'application/json' }
+                    headers: getAuthHeaders(),
+                    credentials: 'same-origin'
                 });
                 if (!res.ok) throw new Error('HTTP status ' + res.status);
                 const result = await res.json();

@@ -32,5 +32,15 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
+
+        // 3. Test User (test@mail.com / password123)
+        User::updateOrCreate(
+            ['email' => 'test@mail.com'],
+            [
+                'name' => 'Test User',
+                'username' => 'test@mail.com',
+                'password' => Hash::make('password123'),
+            ]
+        );
     }
 }

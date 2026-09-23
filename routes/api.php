@@ -15,11 +15,10 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | Base URL: http://localhost:9000/api
-| Middleware: OptionalApiAuth (Toggle via .env: API_JWT_ENABLED=true/false)
 |
 */
 
-// Authentication (Section 7.1)
+// Authentication (Legacy / User Auth)
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::middleware('auth:sanctum')->group(function () {
@@ -28,14 +27,36 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// API Routes with Optional JWT Middleware
-Route::middleware([OptionalApiAuth::class])->group(function () {
+// =========================================================================
+// API v1: Dedicated Service-to-Service Integration Endpoints (JWT B Protected)
+// As specified in isolated-integration-service-architecture.md Section 11 & 20
+// =========================================================================
+Route::prefix('v1')->group(function () {
+    // Purchase Order Endpoints (Requires 'purchase-order:read' scope)
+    Route::middleware(['jwt.eis:purchase-order:read'])->group(function () {
+        Route::get('/purchase-orders/lookup', [PurchaseOrderController::class, 'lookup']);
+        Route::get('/purchase-orders/{id}/pdf', [PurchaseOrderController::class, 'pdf']);
+        Route::get('/purchase-orders/{id}', [PurchaseOrderController::class, 'show']);
+        Route::get('/purchase-orders', [PurchaseOrderController::class, 'index']);
+    });
 
-    // Purchase Request Endpoints (Section 8)
+    // Purchase Request Endpoints (Requires 'purchase-request:read' scope)
+    Route::middleware(['jwt.eis:purchase-request:read'])->group(function () {
+        Route::get('/purchase-requests/lookup', [PurchaseRequestController::class, 'lookup']);
+        Route::get('/purchase-requests/{id}', [PurchaseRequestController::class, 'show']);
+        Route::get('/purchase-requests', [PurchaseRequestController::class, 'index']);
+    });
+});
+
+// =========================================================================
+// Legacy API Routes (with OptionalApiAuth for backward compatibility)
+// =========================================================================
+Route::middleware([OptionalApiAuth::class])->group(function () {
+    // Purchase Request Endpoints
     Route::get('/purchase-requests/lookup', [PurchaseRequestController::class, 'lookup']);
     Route::apiResource('purchase-requests', PurchaseRequestController::class);
 
-    // Purchase Order Endpoints (Section 9 & 10)
+    // Purchase Order Endpoints
     Route::get('/purchase-orders/lookup', [PurchaseOrderController::class, 'lookup']);
     Route::get('/purchase-orders/{id}/pdf', [PurchaseOrderController::class, 'pdf']);
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
