@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Developer Testing Helper (JWT B Generator)
+Route::get('/dev/tokens', [\App\Http\Controllers\Api\DocsController::class, 'tokens']);
+
 // Authentication (Legacy / User Auth)
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);

@@ -14,3 +14,9 @@ Route::get('/logout', [LoginController::class, 'logout']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 });
+
+// Interactive API Documentation & Testing (Scalar & Swagger)
+Route::get('/docs', [\App\Http\Controllers\Api\DocsController::class, 'scalar'])->name('docs');
+Route::get('/swagger', [\App\Http\Controllers\Api\DocsController::class, 'swagger'])->name('swagger');
+Route::get('/docs/openapi.json', [\App\Http\Controllers\Api\DocsController::class, 'openapi'])->name('docs.openapi');
+
