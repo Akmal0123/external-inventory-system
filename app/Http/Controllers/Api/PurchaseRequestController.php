@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
+use App\Http\Traits\UserScopedQuery;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestItem;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PurchaseRequestController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, UserScopedQuery;
 
     /**
      * Search/Lookup Purchase Requests for autocomplete/selection in AMS.
@@ -25,6 +27,15 @@ class PurchaseRequestController extends Controller
 
         $query = PurchaseRequest::query();
 
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Request bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            $query->where('user_id', $user->id);
+        }
+
         if ($keyword !== '') {
             $query->where(function ($q) use ($keyword) {
                 $q->where('pr_number', 'like', "%{$keyword}%")
@@ -35,7 +46,7 @@ class PurchaseRequestController extends Controller
 
         $results = $query->latest('id')
             ->limit(20)
-            ->get(['id', 'pr_number', 'requester_name', 'status']);
+            ->get(['id', 'user_id', 'pr_number', 'requester_name', 'status']);
 
         return $this->successResponse($results);
     }
@@ -47,6 +58,15 @@ class PurchaseRequestController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = PurchaseRequest::with(['company', 'items.item']);
+
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Request bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            $query->where('user_id', $user->id);
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
@@ -91,7 +111,7 @@ class PurchaseRequestController extends Controller
      * Get single Purchase Request detail.
      * Section 8: GET /api/purchase-requests/{id}
      */
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
         $pr = PurchaseRequest::with(['company', 'items.item'])
             ->where('id', $id)
@@ -102,6 +122,17 @@ class PurchaseRequestController extends Controller
             return $this->errorResponse('Purchase Request tidak ditemukan', 404);
         }
 
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Request bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            if ($pr->user_id !== null && $pr->user_id !== $user->id) {
+                return $this->errorResponse('Akses ditolak: Anda hanya dapat mengakses Purchase Request milik Anda sendiri.', 403);
+            }
+        }
+
         return $this->successResponse($this->transformPurchaseRequest($pr));
     }
 
@@ -110,10 +141,15 @@ class PurchaseRequestController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $user = $this->resolveUser($request);
+        if (!$user && !$this->isServiceOrAdmin($request)) {
+            return $this->errorResponse('Akses ditolak: Silakan login terlebih dahulu untuk membuat Purchase Request.', 401);
+        }
+
         $validator = Validator::make($request->all(), [
             'pr_number' => 'required|string|max:50|unique:purchase_requests,pr_number',
             'company_id' => 'required|exists:companies,id',
-            'requester_name' => 'required|string|max:255',
+            'requester_name' => 'nullable|string|max:255',
             'department' => 'required|string|max:255',
             'request_date' => 'required|date',
             'status' => 'nullable|string|in:draft,submitted,approved,rejected',
@@ -130,12 +166,14 @@ class PurchaseRequestController extends Controller
         }
 
         $validated = $validator->validated();
+        $requesterName = $validated['requester_name'] ?? ($user?->name ?? 'Requester');
 
-        $pr = DB::transaction(function () use ($validated) {
+        $pr = DB::transaction(function () use ($validated, $user, $requesterName) {
             $pr = PurchaseRequest::create([
+                'user_id' => $user?->id,
                 'pr_number' => $validated['pr_number'],
                 'company_id' => $validated['company_id'],
-                'requester_name' => $validated['requester_name'],
+                'requester_name' => $requesterName,
                 'department' => $validated['department'],
                 'request_date' => $validated['request_date'],
                 'status' => $validated['status'] ?? 'draft',
@@ -169,10 +207,21 @@ class PurchaseRequestController extends Controller
             return $this->errorResponse('Purchase Request tidak ditemukan', 404);
         }
 
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Request bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            if ($pr->user_id !== null && $pr->user_id !== $user->id) {
+                return $this->errorResponse('Akses ditolak: Anda hanya dapat memperbarui Purchase Request milik Anda sendiri.', 403);
+            }
+        }
+
         $validator = Validator::make($request->all(), [
             'pr_number' => 'required|string|max:50|unique:purchase_requests,pr_number,' . $pr->id,
             'company_id' => 'required|exists:companies,id',
-            'requester_name' => 'required|string|max:255',
+            'requester_name' => 'nullable|string|max:255',
             'department' => 'required|string|max:255',
             'request_date' => 'required|date',
             'status' => 'nullable|string|in:draft,submitted,approved,rejected',
@@ -191,15 +240,20 @@ class PurchaseRequestController extends Controller
         $validated = $validator->validated();
 
         $pr = DB::transaction(function () use ($pr, $validated) {
-            $pr->update([
+            $updateData = [
                 'pr_number' => $validated['pr_number'],
                 'company_id' => $validated['company_id'],
-                'requester_name' => $validated['requester_name'],
                 'department' => $validated['department'],
                 'request_date' => $validated['request_date'],
                 'status' => $validated['status'] ?? $pr->status,
                 'description' => $validated['description'] ?? $pr->description,
-            ]);
+            ];
+
+            if (isset($validated['requester_name'])) {
+                $updateData['requester_name'] = $validated['requester_name'];
+            }
+
+            $pr->update($updateData);
 
             if (isset($validated['items'])) {
                 $pr->items()->delete();
@@ -223,12 +277,23 @@ class PurchaseRequestController extends Controller
     /**
      * Delete Purchase Request.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(Request $request, string $id): JsonResponse
     {
         $pr = PurchaseRequest::find($id);
 
         if (!$pr) {
             return $this->errorResponse('Purchase Request tidak ditemukan', 404);
+        }
+
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Request bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            if ($pr->user_id !== null && $pr->user_id !== $user->id) {
+                return $this->errorResponse('Akses ditolak: Anda hanya dapat menghapus Purchase Request milik Anda sendiri.', 403);
+            }
         }
 
         $pr->delete();
@@ -241,41 +306,39 @@ class PurchaseRequestController extends Controller
      */
     private function transformPurchaseRequest(PurchaseRequest $pr): array
     {
-        $totalEstimated = 0;
-        $items = $pr->items->map(function ($line) use (&$totalEstimated) {
-            $subtotal = $line->quantity * (float) $line->estimated_price;
-            $totalEstimated += $subtotal;
-
-            return [
-                'id' => $line->id,
-                'item_id' => $line->item_id,
-                'item_code' => $line->item?->code,
-                'item_name' => $line->item?->name,
-                'unit' => $line->item?->unit ?? 'unit',
-                'quantity' => $line->quantity,
-                'estimated_price' => (float) $line->estimated_price,
-                'subtotal' => $subtotal,
-                'description' => $line->description,
-            ];
-        });
-
         return [
             'id' => $pr->id,
+            'user_id' => $pr->user_id,
             'pr_number' => $pr->pr_number,
             'company' => $pr->company ? [
                 'id' => $pr->company->id,
                 'code' => $pr->company->code,
                 'name' => $pr->company->name,
+                'address' => $pr->company->address,
             ] : null,
             'requester_name' => $pr->requester_name,
             'department' => $pr->department,
             'request_date' => $pr->request_date?->format('Y-m-d'),
             'status' => $pr->status,
             'description' => $pr->description,
-            'items' => $items,
-            'total_estimated_price' => $totalEstimated,
-            'created_at' => $pr->created_at?->toISOString(),
-            'updated_at' => $pr->updated_at?->toISOString(),
+            'total_estimated_price' => $pr->total_estimated_price,
+            'items' => $pr->items->map(function ($line) {
+                return [
+                    'id' => $line->id,
+                    'item' => $line->item ? [
+                        'id' => $line->item->id,
+                        'code' => $line->item->code,
+                        'name' => $line->item->name,
+                        'unit' => $line->item->unit,
+                    ] : null,
+                    'quantity' => $line->quantity,
+                    'estimated_price' => (float) $line->estimated_price,
+                    'subtotal' => (float) ($line->quantity * $line->estimated_price),
+                    'description' => $line->description,
+                ];
+            })->values()->all(),
+            'created_at' => $pr->created_at?->toIso8601String(),
+            'updated_at' => $pr->updated_at?->toIso8601String(),
         ];
     }
 }

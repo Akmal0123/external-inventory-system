@@ -946,7 +946,14 @@
             <div id="tab-po" class="tab-content active">
                 <div class="card-header" style="padding: 0 0 16px 0;">
                     <div>
-                        <div class="card-title">Daftar Purchase Orders</div>
+                        <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                            <span>Daftar Purchase Orders</span>
+                            @if (!empty($isGlobal))
+                                <span class="badge" style="background: rgba(79, 70, 229, 0.1); color: #4338ca; border: 1px solid rgba(79, 70, 229, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">👑 Mode Admin (Semua PO)</span>
+                            @else
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">🔒 Privat (Milik Anda)</span>
+                            @endif
+                        </div>
                         <div class="card-subtitle">Data PO yang dapat di-lookup dan ditarik oleh Fastify & Digital Approval System</div>
                     </div>
                     <button class="btn btn-primary btn-sm" onclick="openModal('modal-po')">
@@ -1013,7 +1020,14 @@
             <div id="tab-pr" class="tab-content">
                 <div class="card-header" style="padding: 0 0 16px 0;">
                     <div>
-                        <div class="card-title">Daftar Purchase Requests</div>
+                        <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                            <span>Daftar Purchase Requests</span>
+                            @if (!empty($isGlobal))
+                                <span class="badge" style="background: rgba(79, 70, 229, 0.1); color: #4338ca; border: 1px solid rgba(79, 70, 229, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">👑 Mode Admin (Semua PR)</span>
+                            @else
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">🔒 Privat (Milik Anda)</span>
+                            @endif
+                        </div>
                         <div class="card-subtitle">Permintaan pengadaan sebelum diterbitkan menjadi Purchase Order</div>
                     </div>
                     <button class="btn btn-primary btn-sm" onclick="openModal('modal-pr')">
@@ -1202,7 +1216,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Nama Requester *</label>
-                            <input type="text" name="requester_name" class="form-control" placeholder="Contoh: Budi Santoso" required>
+                            <input type="text" name="requester_name" class="form-control" placeholder="Contoh: Budi Santoso" value="{{ Auth::user()->name ?? '' }}" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Departemen *</label>

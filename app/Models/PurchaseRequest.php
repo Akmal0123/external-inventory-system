@@ -12,6 +12,7 @@ class PurchaseRequest extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'pr_number',
         'company_id',
         'requester_name',
@@ -26,6 +27,11 @@ class PurchaseRequest extends Model
         return [
             'request_date' => 'date:Y-m-d',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function company(): BelongsTo

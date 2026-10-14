@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Item;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestItem;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class PurchaseRequestSeeder extends Seeder
@@ -15,6 +16,7 @@ class PurchaseRequestSeeder extends Seeder
      */
     public function run(): void
     {
+        $testUser = User::where('email', 'test@mail.com')->first();
         $prsData = [
             [
                 'pr_number' => 'PR-2026-0001',
@@ -91,6 +93,7 @@ class PurchaseRequestSeeder extends Seeder
             $pr = PurchaseRequest::updateOrCreate(
                 ['pr_number' => $prRow['pr_number']],
                 [
+                    'user_id' => $testUser?->id,
                     'company_id' => $company->id,
                     'requester_name' => $prRow['requester_name'],
                     'department' => $prRow['department'],

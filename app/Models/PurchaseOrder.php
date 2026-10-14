@@ -12,6 +12,7 @@ class PurchaseOrder extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'po_number',
         'purchase_request_id',
         'company_id',
@@ -32,6 +33,11 @@ class PurchaseOrder extends Model
             'tax' => 'decimal:2',
             'total' => 'decimal:2',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function purchaseRequest(): BelongsTo

@@ -23,6 +23,7 @@ Route::get('/dev/tokens', [\App\Http\Controllers\Api\DocsController::class, 'tok
 
 // Authentication (Legacy / User Auth)
 Route::prefix('auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);

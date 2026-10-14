@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\PurchaseRequest;
+use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Database\Seeder;
 
@@ -17,6 +18,7 @@ class PurchaseOrderSeeder extends Seeder
      */
     public function run(): void
     {
+        $testUser = User::where('email', 'test@mail.com')->first();
         $posData = [
             [
                 'po_number' => 'PO-2026-0001',
@@ -113,6 +115,7 @@ class PurchaseOrderSeeder extends Seeder
             $po = PurchaseOrder::updateOrCreate(
                 ['po_number' => $poRow['po_number']],
                 [
+                    'user_id' => $testUser?->id,
                     'purchase_request_id' => $prId,
                     'company_id' => $company->id,
                     'vendor_id' => $vendor->id,

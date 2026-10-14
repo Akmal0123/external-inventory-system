@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
+use App\Http\Traits\UserScopedQuery;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PurchaseOrderController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, UserScopedQuery;
 
     /**
      * Search/Lookup Purchase Orders for autocomplete/selection in AMS/Fastify.
@@ -26,6 +28,15 @@ class PurchaseOrderController extends Controller
         $keyword = trim($request->input('q', ''));
 
         $query = PurchaseOrder::with(['vendor']);
+
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Order bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            $query->where('user_id', $user->id);
+        }
 
         if ($keyword !== '') {
             $query->where(function ($q) use ($keyword) {
@@ -59,6 +70,15 @@ class PurchaseOrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest', 'items.item']);
+
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Order bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            $query->where('user_id', $user->id);
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
@@ -108,7 +128,7 @@ class PurchaseOrderController extends Controller
      * Get single Purchase Order detail.
      * Section 9: GET /api/purchase-orders/{id}
      */
-    public function show(string $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
         $po = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest', 'items.item'])
             ->where('id', $id)
@@ -119,6 +139,17 @@ class PurchaseOrderController extends Controller
             return $this->errorResponse('Purchase Order tidak ditemukan', 404);
         }
 
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Order bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            if ($po->user_id !== null && $po->user_id !== $user->id) {
+                return $this->errorResponse('Akses ditolak: Anda hanya dapat mengakses Purchase Order milik Anda sendiri.', 403);
+            }
+        }
+
         return $this->successResponse($this->transformPurchaseOrder($po));
     }
 
@@ -127,6 +158,11 @@ class PurchaseOrderController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $user = $this->resolveUser($request);
+        if (!$user && !$this->isServiceOrAdmin($request)) {
+            return $this->errorResponse('Akses ditolak: Silakan login terlebih dahulu untuk membuat Purchase Order.', 401);
+        }
+
         $validator = Validator::make($request->all(), [
             'po_number' => 'required|string|max:50|unique:purchase_orders,po_number',
             'purchase_request_id' => 'nullable|exists:purchase_requests,id',
@@ -149,7 +185,7 @@ class PurchaseOrderController extends Controller
 
         $validated = $validator->validated();
 
-        $po = DB::transaction(function () use ($validated) {
+        $po = DB::transaction(function () use ($validated, $user) {
             $subtotal = 0;
             foreach ($validated['items'] as $itemLine) {
                 $subtotal += ($itemLine['quantity'] * $itemLine['unit_price']);
@@ -159,6 +195,7 @@ class PurchaseOrderController extends Controller
             $total = $subtotal + $tax;
 
             $po = PurchaseOrder::create([
+                'user_id' => $user?->id,
                 'po_number' => $validated['po_number'],
                 'purchase_request_id' => $validated['purchase_request_id'] ?? null,
                 'company_id' => $validated['company_id'],
@@ -198,6 +235,17 @@ class PurchaseOrderController extends Controller
 
         if (!$po) {
             return $this->errorResponse('Purchase Order tidak ditemukan', 404);
+        }
+
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Order bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            if ($po->user_id !== null && $po->user_id !== $user->id) {
+                return $this->errorResponse('Akses ditolak: Anda hanya dapat memperbarui Purchase Order milik Anda sendiri.', 403);
+            }
         }
 
         $validator = Validator::make($request->all(), [
@@ -268,12 +316,23 @@ class PurchaseOrderController extends Controller
     /**
      * Delete Purchase Order.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(Request $request, string $id): JsonResponse
     {
         $po = PurchaseOrder::find($id);
 
         if (!$po) {
             return $this->errorResponse('Purchase Order tidak ditemukan', 404);
+        }
+
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Order bersifat privat. Silakan login atau sertakan token otentikasi.', 401);
+            }
+            if ($po->user_id !== null && $po->user_id !== $user->id) {
+                return $this->errorResponse('Akses ditolak: Anda hanya dapat menghapus Purchase Order milik Anda sendiri.', 403);
+            }
         }
 
         $po->delete();
@@ -285,7 +344,7 @@ class PurchaseOrderController extends Controller
      * Generate & stream Purchase Order PDF.
      * Section 10: GET /api/purchase-orders/{id}/pdf
      */
-    public function pdf(string $id): Response|JsonResponse
+    public function pdf(Request $request, string $id): Response|JsonResponse
     {
         $po = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest', 'items.item'])
             ->where('id', $id)
@@ -294,6 +353,17 @@ class PurchaseOrderController extends Controller
 
         if (!$po) {
             return $this->errorResponse('Purchase Order tidak ditemukan', 404);
+        }
+
+        // User data privacy scoping
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user) {
+                return $this->errorResponse('Akses ditolak: Data Purchase Order bersifat privat. Silakan login terlebih dahulu.', 401);
+            }
+            if ($po->user_id !== null && $po->user_id !== $user->id) {
+                return $this->errorResponse('Akses ditolak: Anda hanya dapat mengakses berkas PDF Purchase Order milik Anda sendiri.', 403);
+            }
         }
 
         $pdf = Pdf::loadView('pdf.purchase_order', ['po' => $po]);
@@ -315,10 +385,13 @@ class PurchaseOrderController extends Controller
     {
         return [
             'id' => $po->id,
+            'user_id' => $po->user_id,
             'po_number' => $po->po_number,
             'purchase_request' => $po->purchaseRequest ? [
                 'id' => $po->purchaseRequest->id,
                 'pr_number' => $po->purchaseRequest->pr_number,
+                'requester_name' => $po->purchaseRequest->requester_name,
+                'department' => $po->purchaseRequest->department,
             ] : null,
             'company' => $po->company ? [
                 'id' => $po->company->id,
@@ -337,24 +410,26 @@ class PurchaseOrderController extends Controller
             'order_date' => $po->order_date?->format('Y-m-d'),
             'status' => $po->status,
             'description' => $po->description,
-            'items' => $po->items->map(function ($itemLine) {
-                return [
-                    'id' => $itemLine->id,
-                    'item_id' => $itemLine->item_id,
-                    'item_code' => $itemLine->item?->code,
-                    'item_name' => $itemLine->item?->name,
-                    'unit' => $itemLine->item?->unit ?? 'unit',
-                    'quantity' => $itemLine->quantity,
-                    'unit_price' => (float) $itemLine->unit_price,
-                    'subtotal' => (float) $itemLine->subtotal,
-                    'description' => $itemLine->description,
-                ];
-            }),
             'subtotal' => (float) $po->subtotal,
             'tax' => (float) $po->tax,
             'total' => (float) $po->total,
-            'created_at' => $po->created_at?->toISOString(),
-            'updated_at' => $po->updated_at?->toISOString(),
+            'items' => $po->items->map(function ($line) {
+                return [
+                    'id' => $line->id,
+                    'item' => $line->item ? [
+                        'id' => $line->item->id,
+                        'code' => $line->item->code,
+                        'name' => $line->item->name,
+                        'unit' => $line->item->unit,
+                    ] : null,
+                    'quantity' => $line->quantity,
+                    'unit_price' => (float) $line->unit_price,
+                    'subtotal' => (float) $line->subtotal,
+                    'description' => $line->description,
+                ];
+            })->values()->all(),
+            'created_at' => $po->created_at?->toIso8601String(),
+            'updated_at' => $po->updated_at?->toIso8601String(),
         ];
     }
 }

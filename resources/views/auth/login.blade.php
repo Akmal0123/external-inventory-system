@@ -233,6 +233,27 @@
         .credential-item span:first-child {
             color: #64748b;
         }
+
+        .login-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 18px;
+        }
+
+        .login-footer a {
+            color: #818cf8;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .login-footer a:hover {
+            color: #a5b4fc;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -296,6 +317,11 @@
                 Masuk ke Dashboard EIS
             </button>
         </form>
+
+        <div class="login-footer">
+            Belum memiliki akun?
+            <a href="{{ route('register') }}">Daftar Akun Baru</a>
+        </div>
 
         <div class="quick-hint">
             <div class="quick-hint-header">

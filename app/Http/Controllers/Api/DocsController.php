@@ -272,6 +272,34 @@ Sistem manajemen inventaris eksternal yang menyediakan data Purchase Order (PO),
                         'responses' => ['200' => ['description' => 'Detail PR ditemukan']],
                     ],
                 ],
+                '/api/auth/register' => [
+                    'post' => [
+                        'tags' => ['Auth & User'],
+                        'summary' => 'Registrasi Pengguna Baru EIS (Mendapatkan Sanctum Token)',
+                        'requestBody' => [
+                            'required' => true,
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'required' => ['name', 'email', 'password', 'password_confirmation'],
+                                        'properties' => [
+                                            'name' => ['type' => 'string', 'example' => 'Budi Pratama'],
+                                            'username' => ['type' => 'string', 'example' => 'budipratama'],
+                                            'email' => ['type' => 'string', 'example' => 'budi@external-system.local'],
+                                            'password' => ['type' => 'string', 'example' => 'password123'],
+                                            'password_confirmation' => ['type' => 'string', 'example' => 'password123'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            '201' => ['description' => 'Pendaftaran akun baru berhasil'],
+                            '422' => ['description' => 'Validasi gagal'],
+                        ],
+                    ],
+                ],
                 '/api/auth/login' => [
                     'post' => [
                         'tags' => ['Auth & User'],
