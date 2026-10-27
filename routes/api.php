@@ -58,11 +58,13 @@ Route::prefix('v1')->group(function () {
 Route::middleware([OptionalApiAuth::class])->group(function () {
     // Purchase Request Endpoints
     Route::get('/purchase-requests/lookup', [PurchaseRequestController::class, 'lookup']);
+    Route::post('/purchase-requests/{id}/sync', [PurchaseRequestController::class, 'sync']);
     Route::apiResource('purchase-requests', PurchaseRequestController::class);
 
     // Purchase Order Endpoints
     Route::get('/purchase-orders/lookup', [PurchaseOrderController::class, 'lookup']);
     Route::get('/purchase-orders/{id}/pdf', [PurchaseOrderController::class, 'pdf']);
+    Route::post('/purchase-orders/{id}/sync', [PurchaseOrderController::class, 'sync']);
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
 
     // Master Data CRUD Endpoints

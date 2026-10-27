@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>External Inventory System — Integration Simulator</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary: #4f46e5;
@@ -146,7 +149,7 @@
             right: -20%;
             width: 450px;
             height: 450px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
             border-radius: 50%;
             pointer-events: none;
         }
@@ -428,7 +431,8 @@
             color: #0891b2;
         }
 
-        .status-cancelled, .status-rejected {
+        .status-cancelled,
+        .status-rejected {
             background: var(--danger-light);
             color: var(--danger);
         }
@@ -638,12 +642,21 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(10px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .modal-header {
@@ -749,7 +762,7 @@
         .items-table input:focus {
             outline: none;
             border-color: var(--border-focus);
-            box-shadow: 0 0 0 2px rgba(99,102,241,0.12);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.12);
         }
 
         .btn-danger {
@@ -820,15 +833,29 @@
             font-weight: 600;
         }
 
-        .toast.success { border-left: 4px solid var(--success); }
-        .toast.error { border-left: 4px solid var(--danger); }
-
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateX(40px); }
-            to { opacity: 1; transform: translateX(0); }
+        .toast.success {
+            border-left: 4px solid var(--success);
         }
 
-        .toast-icon { font-size: 18px; }
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-icon {
+            font-size: 18px;
+        }
 
         .form-row {
             display: grid;
@@ -837,6 +864,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Top Navbar -->
@@ -857,16 +885,23 @@
                 <strong>Port:</strong> 9000
             </div>
             @auth
-            <div class="badge-pill" style="background: rgba(79, 70, 229, 0.08); border-color: rgba(79, 70, 229, 0.25); color: #4338ca;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:-2px; margin-right: 4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                <span>{{ Auth::user()->name }} ({{ Auth::user()->email }})</span>
-            </div>
-            <form action="{{ url('/logout') }}" method="POST" style="display: inline-block;">
-                @csrf
-                <button type="submit" class="btn btn-secondary btn-sm" style="padding: 6px 14px; font-weight: 700; color: #dc2626; border-color: #fecaca; background: #ffffff; border-radius: 9999px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#ffffff'">
-                    Logout
-                </button>
-            </form>
+                <div class="badge-pill"
+                    style="background: rgba(79, 70, 229, 0.08); border-color: rgba(79, 70, 229, 0.25); color: #4338ca;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="display:inline-block; vertical-align:-2px; margin-right: 4px;">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>{{ Auth::user()->name }} ({{ Auth::user()->email }})</span>
+                </div>
+                <form action="{{ url('/logout') }}" method="POST" style="display: inline-block;">
+                    @csrf
+                    <button type="submit" class="btn btn-secondary btn-sm"
+                        style="padding: 6px 14px; font-weight: 700; color: #dc2626; border-color: #fecaca; background: #ffffff; border-radius: 9999px; cursor: pointer; transition: all 0.2s;"
+                        onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#ffffff'">
+                        Logout
+                    </button>
+                </form>
             @endauth
         </div>
     </nav>
@@ -878,11 +913,15 @@
             <span class="hero-tag">System 2 — Mock Provider</span>
             <h2>External Inventory System Service</h2>
             <p>
-                Sistem simulasi penyedia data Purchase Request (PR) dan Purchase Order (PO) untuk integrasi dengan <strong>Digital Approval System (AMS)</strong> via Fastify. Siap digunakan secara lokal dengan REST API CRUD lengkap dan generator PDF.
+                Sistem simulasi penyedia data Purchase Request (PR) dan Purchase Order (PO) untuk integrasi dengan
+                <strong>Digital Approval System (AMS)</strong> via Fastify. Siap digunakan secara lokal dengan REST API
+                CRUD lengkap dan generator PDF.
             </p>
             <div class="hero-meta-grid">
                 <div class="hero-meta-item">Database: <strong>external_inventory_db</strong></div>
-                <div class="hero-meta-item">JWT Toggle: <strong>{{ env('API_JWT_ENABLED') ? 'ENABLED' : 'DISABLED (Dev Mode)' }}</strong></div>
+                <div class="hero-meta-item">JWT Toggle:
+                    <strong>{{ env('API_JWT_ENABLED') ? 'ENABLED' : 'DISABLED (Dev Mode)' }}</strong>
+                </div>
                 <div class="hero-meta-item">Integration User: <strong>integration-service</strong></div>
             </div>
         </div>
@@ -949,15 +988,24 @@
                         <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
                             <span>Daftar Purchase Orders</span>
                             @if (!empty($isGlobal))
-                                <span class="badge" style="background: rgba(79, 70, 229, 0.1); color: #4338ca; border: 1px solid rgba(79, 70, 229, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">👑 Mode Admin (Semua PO)</span>
+                                <span class="badge"
+                                    style="background: rgba(79, 70, 229, 0.1); color: #4338ca; border: 1px solid rgba(79, 70, 229, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">👑
+                                    Mode Admin (Semua PO)</span>
                             @else
-                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">🔒 Privat (Milik Anda)</span>
+                                <span class="badge"
+                                    style="background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">🔒
+                                    Privat (Milik Anda)</span>
                             @endif
                         </div>
-                        <div class="card-subtitle">Data PO yang dapat di-lookup dan ditarik oleh Fastify & Digital Approval System</div>
+                        <div class="card-subtitle">Data PO yang dapat di-lookup dan ditarik oleh Fastify & Digital
+                            Approval System</div>
                     </div>
                     <button class="btn btn-primary btn-sm" onclick="openModal('modal-po')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
                         Tambah PO
                     </button>
                 </div>
@@ -978,38 +1026,46 @@
                         </thead>
                         <tbody>
                             @forelse($recentPOs as $po)
-                            <tr>
-                                <td>
-                                    <strong style="color: var(--primary);">{{ $po->po_number }}</strong>
-                                </td>
-                                <td>{{ $po->purchaseRequest?->pr_number ?? '-' }}</td>
-                                <td>{{ $po->company?->code }} ({{ $po->company?->name }})</td>
-                                <td>{{ $po->vendor?->name }}</td>
-                                <td>{{ $po->order_date?->format('d/m/Y') }}</td>
-                                <td>
-                                    <span class="status-badge status-{{ strtolower($po->status) }}">{{ $po->status }}</span>
-                                </td>
-                                <td style="text-align: right; font-weight: 700;">
-                                    Rp {{ number_format($po->total, 0, ',', '.') }}
-                                </td>
-                                <td style="text-align: center;">
-                                    <div style="display: inline-flex; gap: 6px;">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="showPoDetail({{ $po->id }})" title="View Detail Purchase Order">
-                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px; vertical-align: -1.5px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                            View Detail
-                                        </button>
-                                        <a href="/api/purchase-orders/{{ $po->id }}" target="_blank" class="btn btn-secondary btn-sm" title="Lihat JSON API">
-                                            JSON API
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>
+                                        <strong style="color: var(--primary);">{{ $po->po_number }}</strong>
+                                    </td>
+                                    <td>{{ $po->purchaseRequest?->pr_number ?? '-' }}</td>
+                                    <td>{{ $po->company?->code }} ({{ $po->company?->name }})</td>
+                                    <td>{{ $po->vendor?->name }}</td>
+                                    <td>{{ $po->order_date?->format('d/m/Y') }}</td>
+                                    <td>
+                                        <span
+                                            class="status-badge status-{{ strtolower($po->status) }}">{{ $po->status }}</span>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 700;">
+                                        Rp {{ number_format($po->total, 0, ',', '.') }}
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <div style="display: inline-flex; gap: 6px;">
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                onclick="showPoDetail({{ $po->id }})" title="View Detail Purchase Order">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2.5"
+                                                    style="margin-right: 4px; vertical-align: -1.5px;">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                                View Detail
+                                            </button>
+                                            <a href="/api/purchase-orders/{{ $po->id }}" target="_blank"
+                                                class="btn btn-secondary btn-sm" title="Lihat JSON API">
+                                                JSON API
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
-                                    Belum ada data Purchase Order.
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                        Belum ada data Purchase Order.
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -1023,15 +1079,23 @@
                         <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
                             <span>Daftar Purchase Requests</span>
                             @if (!empty($isGlobal))
-                                <span class="badge" style="background: rgba(79, 70, 229, 0.1); color: #4338ca; border: 1px solid rgba(79, 70, 229, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">👑 Mode Admin (Semua PR)</span>
+                                <span class="badge"
+                                    style="background: rgba(79, 70, 229, 0.1); color: #4338ca; border: 1px solid rgba(79, 70, 229, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">👑
+                                    Mode Admin (Semua PR)</span>
                             @else
-                                <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">🔒 Privat (Milik Anda)</span>
+                                <span class="badge"
+                                    style="background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); font-size: 11px; padding: 2px 8px; border-radius: 9999px;">🔒
+                                    Privat (Milik Anda)</span>
                             @endif
                         </div>
                         <div class="card-subtitle">Permintaan pengadaan sebelum diterbitkan menjadi Purchase Order</div>
                     </div>
                     <button class="btn btn-primary btn-sm" onclick="openModal('modal-pr')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
                         Tambah PR
                     </button>
                 </div>
@@ -1052,28 +1116,30 @@
                         </thead>
                         <tbody>
                             @forelse($recentPRs as $pr)
-                            <tr>
-                                <td><strong style="color: var(--primary);">{{ $pr->pr_number }}</strong></td>
-                                <td>{{ $pr->requester_name }}</td>
-                                <td>{{ $pr->department }}</td>
-                                <td>{{ $pr->company?->code }}</td>
-                                <td>{{ $pr->request_date?->format('d/m/Y') }}</td>
-                                <td>
-                                    <span class="status-badge status-{{ strtolower($pr->status) }}">{{ $pr->status }}</span>
-                                </td>
-                                <td style="text-align: center;">{{ $pr->items->count() }} item</td>
-                                <td style="text-align: center;">
-                                    <a href="/api/purchase-requests/{{ $pr->id }}" target="_blank" class="btn btn-secondary btn-sm">
-                                        Lihat JSON Detail
-                                    </a>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td><strong style="color: var(--primary);">{{ $pr->pr_number }}</strong></td>
+                                    <td>{{ $pr->requester_name }}</td>
+                                    <td>{{ $pr->department }}</td>
+                                    <td>{{ $pr->company?->code }}</td>
+                                    <td>{{ $pr->request_date?->format('d/m/Y') }}</td>
+                                    <td>
+                                        <span
+                                            class="status-badge status-{{ strtolower($pr->status) }}">{{ $pr->status }}</span>
+                                    </td>
+                                    <td style="text-align: center;">{{ $pr->items->count() }} item</td>
+                                    <td style="text-align: center;">
+                                        <a href="/api/purchase-requests/{{ $pr->id }}" target="_blank"
+                                            class="btn btn-secondary btn-sm">
+                                            Lihat JSON Detail
+                                        </a>
+                                    </td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
-                                    Belum ada data Purchase Request.
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                                        Belum ada data Purchase Request.
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -1103,15 +1169,15 @@
                         </thead>
                         <tbody id="items-table-body">
                             @foreach($items as $item)
-                            <tr>
-                                <td><code>{{ $item->code }}</code></td>
-                                <td><strong>{{ $item->name }}</strong></td>
-                                <td style="color: var(--text-muted); font-size: 12.5px;">{{ $item->description }}</td>
-                                <td>{{ $item->unit }}</td>
-                                <td style="text-align: right; font-weight: 600;">
-                                    Rp {{ number_format($item->price, 0, ',', '.') }}
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td><code>{{ $item->code }}</code></td>
+                                    <td><strong>{{ $item->name }}</strong></td>
+                                    <td style="color: var(--text-muted); font-size: 12.5px;">{{ $item->description }}</td>
+                                    <td>{{ $item->unit }}</td>
+                                    <td style="text-align: right; font-weight: 600;">
+                                        Rp {{ number_format($item->price, 0, ',', '.') }}
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -1141,13 +1207,14 @@
                         </thead>
                         <tbody id="vendors-table-body">
                             @foreach($vendors as $vendor)
-                            <tr>
-                                <td><code>{{ $vendor->code }}</code></td>
-                                <td><strong>{{ $vendor->name }}</strong></td>
-                                <td style="font-size: 12.5px;">{{ $vendor->address }}</td>
-                                <td>{{ $vendor->phone }}</td>
-                                <td><a href="mailto:{{ $vendor->email }}" style="color: var(--primary);">{{ $vendor->email }}</a></td>
-                            </tr>
+                                <tr>
+                                    <td><code>{{ $vendor->code }}</code></td>
+                                    <td><strong>{{ $vendor->name }}</strong></td>
+                                    <td style="font-size: 12.5px;">{{ $vendor->address }}</td>
+                                    <td>{{ $vendor->phone }}</td>
+                                    <td><a href="mailto:{{ $vendor->email }}"
+                                            style="color: var(--primary);">{{ $vendor->email }}</a></td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -1159,18 +1226,23 @@
                 <div class="card-header" style="padding: 0 0 16px 0;">
                     <div>
                         <div class="card-title">REST API Live Simulator</div>
-                        <div class="card-subtitle">Uji respon endpoint REST API secara interaktif langsung dari browser</div>
+                        <div class="card-subtitle">Uji respon endpoint REST API secara interaktif langsung dari browser
+                        </div>
                     </div>
                 </div>
 
                 <div class="api-console">
                     <div class="api-controls">
                         <select id="api-endpoint-selector" class="api-select">
-                            <option value="GET /api/purchase-orders/lookup?q=PO-2026">GET /api/purchase-orders/lookup?q=PO-2026</option>
-                            <option value="GET /api/purchase-orders">GET /api/purchase-orders (List PO with Pagination)</option>
+                            <option value="GET /api/purchase-orders/lookup?q=PO-2026">GET
+                                /api/purchase-orders/lookup?q=PO-2026</option>
+                            <option value="GET /api/purchase-orders">GET /api/purchase-orders (List PO with Pagination)
+                            </option>
                             <option value="GET /api/purchase-orders/1">GET /api/purchase-orders/1 (Detail PO)</option>
-                            <option value="GET /api/purchase-requests/lookup?q=PR-2026">GET /api/purchase-requests/lookup?q=PR-2026</option>
-                            <option value="GET /api/purchase-requests/1">GET /api/purchase-requests/1 (Detail PR)</option>
+                            <option value="GET /api/purchase-requests/lookup?q=PR-2026">GET
+                                /api/purchase-requests/lookup?q=PR-2026</option>
+                            <option value="GET /api/purchase-requests/1">GET /api/purchase-requests/1 (Detail PR)
+                            </option>
                             <option value="GET /api/items">GET /api/items (List Barang)</option>
                             <option value="GET /api/vendors">GET /api/vendors (List Vendor)</option>
                             <option value="POST /api/auth/login">POST /api/auth/login (Auth Token for Fastify)</option>
@@ -1178,8 +1250,10 @@
                         <button class="btn btn-primary" onclick="executeApiTest()">Kirim Request</button>
                     </div>
 
-                    <div style="margin-bottom: 8px; font-size: 12px; color: #94a3b8;">Status Response: <span id="api-status-code" style="color: #38bdf8; font-weight: bold;">Siap</span></div>
-                    <pre id="api-result-box" class="api-preview">// Klik tombol "Kirim Request" di atas untuk melihat respon JSON real-time dari REST API External Inventory System.</pre>
+                    <div style="margin-bottom: 8px; font-size: 12px; color: #94a3b8;">Status Response: <span
+                            id="api-status-code" style="color: #38bdf8; font-weight: bold;">Siap</span></div>
+                    <pre id="api-result-box"
+                        class="api-preview">// Klik tombol "Kirim Request" di atas untuk melihat respon JSON real-time dari REST API External Inventory System.</pre>
                 </div>
             </div>
 
@@ -1201,57 +1275,63 @@
                 <div class="modal-body">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                            <label class="form-label"
+                                style="display: flex; justify-content: space-between; align-items: center;">
                                 <span>Nomor PR *</span>
-                                <span style="font-size: 11px; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-weight: 600;">Otomatis</span>
+                                <span
+                                    style="font-size: 11px; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-weight: 600;">Otomatis</span>
                             </label>
-                            <input type="text" name="pr_number" id="pr-number-input" class="form-control" value="{{ $nextPrNumber ?? 'PR-' . date('Y') . '-0001' }}" readonly style="background-color: #f8fafc; cursor: not-allowed; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #334155;" required>
-                            <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">Nomor PR di-generate secara otomatis oleh sistem</small>
+                            <input type="text" name="pr_number" id="pr-number-input" class="form-control"
+                                value="{{ $nextPrNumber ?? 'TSPM10000/' . date('Y/m') . '/PR0001' }}" readonly
+                                style="background-color: #f8fafc; cursor: not-allowed; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #334155;"
+                                required>
+                            <small
+                                style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">Nomor
+                                PR di-generate secara otomatis oleh sistem (Format: TSPM10000/YYYY/MM/PR0001)</small>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Tanggal Request *</label>
-                            <input type="date" name="request_date" class="form-control" value="{{ date('Y-m-d') }}" required>
+                            <input type="date" name="request_date" class="form-control" value="{{ date('Y-m-d') }}"
+                                required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Nama Requester *</label>
-                            <input type="text" name="requester_name" class="form-control" placeholder="Contoh: Budi Santoso" value="{{ Auth::user()->name ?? '' }}" required>
+                            <input type="text" name="requester_name" class="form-control"
+                                placeholder="Contoh: Budi Santoso" value="{{ Auth::user()->name ?? '' }}" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Departemen *</label>
-                            <input type="text" name="department" class="form-control" placeholder="Contoh: IT Department" required>
+                            <input type="text" name="department" class="form-control"
+                                placeholder="Contoh: IT Department" required>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Company *</label>
-                            <select name="company_id" class="form-control" required>
-                                <option value="">-- Pilih Company --</option>
-                                @foreach($companies as $company)
+                    <input type="hidden" name="status" value="draft">
+                    <div class="form-group">
+                        <label class="form-label">Company *</label>
+                        <select name="company_id" class="form-control" required>
+                            <option value="">-- Pilih Company --</option>
+                            @foreach($companies as $company)
                                 <option value="{{ $company->id }}">{{ $company->code }} - {{ $company->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select name="status" class="form-control">
-                                <option value="draft">Draft</option>
-                                <option value="submitted">Submitted</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
-                        </div>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Deskripsi</label>
-                        <textarea name="description" class="form-control" rows="2" placeholder="Keterangan atau keperluan pengadaan..."></textarea>
+                        <textarea name="description" class="form-control" rows="2"
+                            placeholder="Keterangan atau keperluan pengadaan..."></textarea>
                     </div>
 
-                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div
+                        style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                         <label class="form-label" style="margin-bottom: 0;">Item Barang *</label>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="addPRItemRow()">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
                             Tambah Baris
                         </button>
                     </div>
@@ -1298,16 +1378,19 @@
                 <div class="modal-body">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                            <label class="form-label"
+                                style="display: flex; justify-content: space-between; align-items: center;">
                                 <span>Nomor PO *</span>
-                                <span style="font-size: 11px; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-weight: 600;">Otomatis</span>
                             </label>
-                            <input type="text" name="po_number" id="po-number-input" class="form-control" value="{{ $nextPoNumber ?? 'PO-' . date('Y') . '-0001' }}" readonly style="background-color: #f8fafc; cursor: not-allowed; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #334155;" required>
-                            <small style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">Nomor PO di-generate secara otomatis oleh sistem</small>
+                            <input type="text" name="po_number" id="po-number-input" class="form-control"
+                                value="{{ $nextPoNumber ?? 'TSPM/' . date('Y/m') . '/PO/0001' }}" readonly
+                                style="background-color: #f8fafc; cursor: not-allowed; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #334155;"
+                                required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Tanggal Order *</label>
-                            <input type="date" name="order_date" class="form-control" value="{{ date('Y-m-d') }}" required>
+                            <input type="date" name="order_date" class="form-control" value="{{ date('Y-m-d') }}"
+                                required>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1316,7 +1399,7 @@
                             <select name="company_id" class="form-control" required>
                                 <option value="">-- Pilih Company --</option>
                                 @foreach($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->code }} - {{ $company->name }}</option>
+                                    <option value="{{ $company->id }}">{{ $company->code }} - {{ $company->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -1325,46 +1408,42 @@
                             <select name="vendor_id" class="form-control" required>
                                 <option value="">-- Pilih Vendor --</option>
                                 @foreach($vendors as $vendor)
-                                <option value="{{ $vendor->id }}">{{ $vendor->code }} - {{ $vendor->name }}</option>
+                                    <option value="{{ $vendor->id }}">{{ $vendor->code }} - {{ $vendor->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
+                    <input type="hidden" name="status" value="draft">
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Ref. Purchase Request (Opsional)</label>
                             <select name="purchase_request_id" class="form-control" id="po-pr-select">
                                 <option value="">-- Tidak Ada / Bebas --</option>
                                 @foreach($recentPRs as $pr)
-                                <option value="{{ $pr->id }}">{{ $pr->pr_number }} — {{ $pr->requester_name }}</option>
+                                    <option value="{{ $pr->id }}">{{ $pr->pr_number }} — {{ $pr->requester_name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select name="status" class="form-control">
-                                <option value="draft">Draft</option>
-                                <option value="issued">Issued</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
+                            <label class="form-label">Pajak / Tax (Rp)</label>
+                            <input type="number" name="tax" id="po-tax-input" class="form-control" placeholder="0"
+                                min="0" value="0" oninput="updatePOSummary()">
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Pajak / Tax (Rp)</label>
-                            <input type="number" name="tax" id="po-tax-input" class="form-control" placeholder="0" min="0" value="0" oninput="updatePOSummary()">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Deskripsi</label>
-                            <input type="text" name="description" class="form-control" placeholder="Keterangan tambahan...">
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Deskripsi</label>
+                        <input type="text" name="description" class="form-control" placeholder="Keterangan tambahan...">
                     </div>
 
-                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div
+                        style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                         <label class="form-label" style="margin-bottom: 0;">Item Barang *</label>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="addPOItemRow()">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
                             Tambah Baris
                         </button>
                     </div>
@@ -1414,8 +1493,11 @@
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div>
-                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700;">Purchase Order Detail</div>
-                        <h3 id="po-detail-title" style="margin-top: 2px; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                        <div
+                            style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700;">
+                            Purchase Order Detail</div>
+                        <h3 id="po-detail-title"
+                            style="margin-top: 2px; font-size: 18px; display: flex; align-items: center; gap: 8px;">
                             <span id="po-detail-number">PO-XXXX-XXXX</span>
                             <span id="po-detail-status-badge" class="status-badge status-draft">DRAFT</span>
                         </h3>
@@ -1423,11 +1505,14 @@
                 </div>
                 <button class="modal-close" onclick="closeModal('modal-po-detail')">&times;</button>
             </div>
-            
+
             <div class="modal-body" id="po-detail-body">
                 <!-- Loading indicator -->
-                <div id="po-detail-loading" style="display: none; text-align: center; padding: 40px; color: var(--text-muted);">
-                    <div style="display: inline-block; width: 28px; height: 28px; border: 3px solid rgba(79, 70, 229, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;"></div>
+                <div id="po-detail-loading"
+                    style="display: none; text-align: center; padding: 40px; color: var(--text-muted);">
+                    <div
+                        style="display: inline-block; width: 28px; height: 28px; border: 3px solid rgba(79, 70, 229, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;">
+                    </div>
                     <div>Memuat detail Purchase Order...</div>
                 </div>
 
@@ -1437,25 +1522,46 @@
                         <!-- Company Box -->
                         <div class="po-info-card">
                             <div class="po-info-card-header">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/><path d="M14 9h1"/><path d="M14 13h1"/><path d="M14 17h1"/></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M3 21h18" />
+                                    <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16" />
+                                    <path d="M9 9h1" />
+                                    <path d="M9 13h1" />
+                                    <path d="M9 17h1" />
+                                    <path d="M14 9h1" />
+                                    <path d="M14 13h1" />
+                                    <path d="M14 17h1" />
+                                </svg>
                                 <span>Perusahaan Pemesan (Company)</span>
                             </div>
                             <div class="po-info-card-body">
-                                <div style="font-weight: 700; font-size: 14px; color: var(--text-main);" id="po-detail-company-name">-</div>
-                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="po-detail-company-address">-</div>
+                                <div style="font-weight: 700; font-size: 14px; color: var(--text-main);"
+                                    id="po-detail-company-name">-</div>
+                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;"
+                                    id="po-detail-company-address">-</div>
                             </div>
                         </div>
 
                         <!-- Vendor Box -->
                         <div class="po-info-card">
                             <div class="po-info-card-header">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
                                 <span>Vendor / Supplier Rekanan</span>
                             </div>
                             <div class="po-info-card-body">
-                                <div style="font-weight: 700; font-size: 14px; color: var(--text-main);" id="po-detail-vendor-name">-</div>
-                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="po-detail-vendor-address">-</div>
-                                <div style="font-size: 12px; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 12px; color: var(--text-muted);">
+                                <div style="font-weight: 700; font-size: 14px; color: var(--text-main);"
+                                    id="po-detail-vendor-name">-</div>
+                                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;"
+                                    id="po-detail-vendor-address">-</div>
+                                <div
+                                    style="font-size: 12px; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 12px; color: var(--text-muted);">
                                     <span id="po-detail-vendor-phone">Telp: -</span>
                                     <span id="po-detail-vendor-email">Email: -</span>
                                 </div>
@@ -1475,15 +1581,19 @@
                         </div>
                         <div class="po-detail-item" style="flex: 2; min-width: 200px;">
                             <span class="po-detail-label">Keterangan / Deskripsi</span>
-                            <span class="po-detail-value" id="po-detail-description" style="font-weight: normal; color: var(--text-muted);">-</span>
+                            <span class="po-detail-value" id="po-detail-description"
+                                style="font-weight: normal; color: var(--text-muted);">-</span>
                         </div>
                     </div>
 
                     <!-- Items Section -->
                     <div style="margin-top: 16px;">
-                        <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div
+                            style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                             <span>Daftar Item Barang</span>
-                            <span id="po-detail-items-count" style="font-size: 11px; background: #f1f5f9; border: 1px solid var(--border-color); padding: 2px 8px; border-radius: 9999px; font-weight: 600;">0 item</span>
+                            <span id="po-detail-items-count"
+                                style="font-size: 11px; background: #f1f5f9; border: 1px solid var(--border-color); padding: 2px 8px; border-radius: 9999px; font-weight: 600;">0
+                                item</span>
                         </div>
                         <div style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px;">
                             <table class="detail-items-table">
@@ -1523,11 +1633,20 @@
 
             <div class="modal-footer" style="justify-content: space-between;">
                 <div style="display: flex; gap: 8px;">
-                    <a id="po-detail-pdf-btn" href="#" target="_blank" class="btn btn-primary" title="Buka / Download PDF">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: -1px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    <a id="po-detail-pdf-btn" href="#" target="_blank" class="btn btn-primary"
+                        title="Buka / Download PDF">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" style="margin-right: 4px; vertical-align: -1px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                        </svg>
                         Download PDF
                     </a>
-                    <a id="po-detail-json-btn" href="#" target="_blank" class="btn btn-secondary" title="Buka Response JSON API">
+                    <a id="po-detail-json-btn" href="#" target="_blank" class="btn btn-secondary"
+                        title="Buka Response JSON API">
                         JSON API
                     </a>
                 </div>
@@ -1551,16 +1670,19 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Nama Barang *</label>
-                        <input type="text" name="name" class="form-control" placeholder="Contoh: Printer EPSON L3250" required>
+                        <input type="text" name="name" class="form-control" placeholder="Contoh: Printer EPSON L3250"
+                            required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Deskripsi</label>
-                        <textarea name="description" class="form-control" rows="2" placeholder="Deskripsi peruntukan..."></textarea>
+                        <textarea name="description" class="form-control" rows="2"
+                            placeholder="Deskripsi peruntukan..."></textarea>
                     </div>
                     <div style="display: flex; gap: 12px;">
                         <div class="form-group" style="flex: 1;">
                             <label class="form-label">Satuan *</label>
-                            <input type="text" name="unit" class="form-control" placeholder="unit, pcs, rim, box" required>
+                            <input type="text" name="unit" class="form-control" placeholder="unit, pcs, rim, box"
+                                required>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label class="form-label">Harga Standar (Rp) *</label>
@@ -1591,11 +1713,13 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Nama Vendor *</label>
-                        <input type="text" name="name" class="form-control" placeholder="Contoh: CV Media Kreatif Mandiri" required>
+                        <input type="text" name="name" class="form-control"
+                            placeholder="Contoh: CV Media Kreatif Mandiri" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Alamat</label>
-                        <input type="text" name="address" class="form-control" placeholder="Kota atau alamat lengkap...">
+                        <input type="text" name="address" class="form-control"
+                            placeholder="Kota atau alamat lengkap...">
                     </div>
                     <div style="display: flex; gap: 12px;">
                         <div class="form-group" style="flex: 1;">
@@ -1616,61 +1740,63 @@
         </div>
     </div>
 
-@php
-    $itemsMasterJson = $items->map(function ($i) {
-        return [
-            'id'    => $i->id,
-            'code'  => $i->code,
-            'name'  => $i->name,
-            'price' => (float) $i->price,
-            'unit'  => $i->unit,
-        ];
-    })->values()->toJson();
+    @php
+        $itemsMasterJson = $items->map(function ($i) {
+            return [
+                'id' => $i->id,
+                'code' => $i->code,
+                'name' => $i->name,
+                'price' => (float) $i->price,
+                'unit' => $i->unit,
+            ];
+        })->values()->toJson();
 
-    $recentPosJson = $recentPOs->mapWithKeys(function ($po) {
-        return [$po->id => [
-            'id' => $po->id,
-            'po_number' => $po->po_number,
-            'purchase_request' => $po->purchaseRequest ? [
-                'id' => $po->purchaseRequest->id,
-                'pr_number' => $po->purchaseRequest->pr_number,
-            ] : null,
-            'company' => $po->company ? [
-                'id' => $po->company->id,
-                'code' => $po->company->code,
-                'name' => $po->company->name,
-                'address' => $po->company->address,
-            ] : null,
-            'vendor' => $po->vendor ? [
-                'id' => $po->vendor->id,
-                'code' => $po->vendor->code,
-                'name' => $po->vendor->name,
-                'address' => $po->vendor->address,
-                'phone' => $po->vendor->phone,
-                'email' => $po->vendor->email,
-            ] : null,
-            'order_date' => $po->order_date?->format('d/m/Y') ?? '-',
-            'raw_order_date' => $po->order_date?->format('Y-m-d') ?? '',
-            'status' => $po->status,
-            'description' => $po->description,
-            'subtotal' => (float) $po->subtotal,
-            'tax' => (float) $po->tax,
-            'total' => (float) $po->total,
-            'items' => $po->items->map(function ($it) {
-                return [
-                    'id' => $it->id,
-                    'item_code' => $it->item?->code ?? '-',
-                    'item_name' => $it->item?->name ?? 'Barang',
-                    'unit' => $it->item?->unit ?? 'unit',
-                    'quantity' => (int) $it->quantity,
-                    'unit_price' => (float) $it->unit_price,
-                    'subtotal' => (float) $it->subtotal,
-                    'description' => $it->description,
-                ];
-            })->values(),
-        ]];
-    })->toJson();
-@endphp
+        $recentPosJson = $recentPOs->mapWithKeys(function ($po) {
+            return [
+                $po->id => [
+                    'id' => $po->id,
+                    'po_number' => $po->po_number,
+                    'purchase_request' => $po->purchaseRequest ? [
+                        'id' => $po->purchaseRequest->id,
+                        'pr_number' => $po->purchaseRequest->pr_number,
+                    ] : null,
+                    'company' => $po->company ? [
+                        'id' => $po->company->id,
+                        'code' => $po->company->code,
+                        'name' => $po->company->name,
+                        'address' => $po->company->address,
+                    ] : null,
+                    'vendor' => $po->vendor ? [
+                        'id' => $po->vendor->id,
+                        'code' => $po->vendor->code,
+                        'name' => $po->vendor->name,
+                        'address' => $po->vendor->address,
+                        'phone' => $po->vendor->phone,
+                        'email' => $po->vendor->email,
+                    ] : null,
+                    'order_date' => $po->order_date?->format('d/m/Y') ?? '-',
+                    'raw_order_date' => $po->order_date?->format('Y-m-d') ?? '',
+                    'status' => $po->status,
+                    'description' => $po->description,
+                    'subtotal' => (float) $po->subtotal,
+                    'tax' => (float) $po->tax,
+                    'total' => (float) $po->total,
+                    'items' => $po->items->map(function ($it) {
+                        return [
+                            'id' => $it->id,
+                            'item_code' => $it->item?->code ?? '-',
+                            'item_name' => $it->item?->name ?? 'Barang',
+                            'unit' => $it->item?->unit ?? 'unit',
+                            'quantity' => (int) $it->quantity,
+                            'unit_price' => (float) $it->unit_price,
+                            'subtotal' => (float) $it->subtotal,
+                            'description' => $it->description,
+                        ];
+                    })->values(),
+                ]
+            ];
+        })->toJson();
+    @endphp
     <script>
         // =====================
         // Auth Token Persistence
@@ -1679,19 +1805,19 @@
             localStorage.setItem('eis_token', '{{ session('api_token') }}');
         @endif
 
-        function getAuthHeaders(extra = {}) {
-            const token = localStorage.getItem('eis_token');
-            const headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                ...extra
-            };
-            if (token) {
-                headers['Authorization'] = 'Bearer ' + token;
+            function getAuthHeaders(extra = {}) {
+                const token = localStorage.getItem('eis_token');
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    ...extra
+                };
+                if (token) {
+                    headers['Authorization'] = 'Bearer ' + token;
+                }
+                return headers;
             }
-            return headers;
-        }
 
         // =====================
         // Master data from Blade
@@ -1800,9 +1926,9 @@
         }
 
         function updatePRRowSubtotal(idx) {
-            const qty   = parseFloat(document.getElementById('pr-qty-'   + idx)?.value || 0);
+            const qty = parseFloat(document.getElementById('pr-qty-' + idx)?.value || 0);
             const price = parseFloat(document.getElementById('pr-price-' + idx)?.value || 0);
-            const sub   = qty * price;
+            const sub = qty * price;
             const el = document.getElementById('pr-sub-' + idx);
             if (el) el.innerText = 'Rp ' + formatNumber(sub);
             updatePRTotal();
@@ -1855,9 +1981,9 @@
         }
 
         function updatePORowSubtotal(idx) {
-            const qty   = parseFloat(document.getElementById('po-qty-'   + idx)?.value || 0);
+            const qty = parseFloat(document.getElementById('po-qty-' + idx)?.value || 0);
             const price = parseFloat(document.getElementById('po-uprice-' + idx)?.value || 0);
-            const sub   = qty * price;
+            const sub = qty * price;
             const el = document.getElementById('po-sub-' + idx);
             if (el) el.innerText = 'Rp ' + formatNumber(sub);
             updatePOSummary();
@@ -1902,10 +2028,10 @@
             data.items = [];
             let valid = true;
             itemRows.forEach(row => {
-                const sel     = row.querySelector('select');
+                const sel = row.querySelector('select');
                 // Extract idx from row id (format: pr-row-{idx})
-                const rowIdx  = row.id.replace('pr-row-', '');
-                const qtyEl   = document.getElementById('pr-qty-' + rowIdx);
+                const rowIdx = row.id.replace('pr-row-', '');
+                const qtyEl = document.getElementById('pr-qty-' + rowIdx);
                 const priceEl = document.getElementById('pr-price-' + rowIdx);
                 if (!sel?.value) { valid = false; return; }
                 data.items.push({
@@ -1964,11 +2090,11 @@
             data.items = [];
             let valid = true;
             itemRows.forEach(row => {
-                const sel     = row.querySelector('select');
+                const sel = row.querySelector('select');
                 // Extract idx from row id (format: po-row-{idx})
-                const rowIdx  = row.id.replace('po-row-', '');
-                const qtyEl   = document.getElementById('po-qty-' + rowIdx);
-                const upriceEl= document.getElementById('po-uprice-' + rowIdx);
+                const rowIdx = row.id.replace('po-row-', '');
+                const qtyEl = document.getElementById('po-qty-' + rowIdx);
+                const upriceEl = document.getElementById('po-uprice-' + rowIdx);
                 if (!sel?.value) { valid = false; return; }
                 data.items.push({
                     item_id: parseInt(sel.value),
@@ -2100,10 +2226,10 @@
         // =====================
         async function showPoDetail(poId) {
             openModal('modal-po-detail');
-            
+
             const loading = document.getElementById('po-detail-loading');
             const content = document.getElementById('po-detail-content');
-            
+
             // If available in server-rendered map, show immediately
             if (RECENT_POS_MAP && RECENT_POS_MAP[poId]) {
                 loading.style.display = 'none';
@@ -2139,7 +2265,7 @@
             if (!po) return;
 
             document.getElementById('po-detail-number').innerText = po.po_number || '-';
-            
+
             const statusBadge = document.getElementById('po-detail-status-badge');
             const status = (po.status || 'draft').toLowerCase();
             statusBadge.className = 'status-badge status-' + status;
@@ -2166,7 +2292,7 @@
             const items = po.items || [];
             document.getElementById('po-detail-items-count').innerText = items.length + ' item';
             const tbody = document.getElementById('po-detail-items-body');
-            
+
             if (items.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Tidak ada item tercatat dalam Purchase Order ini.</td></tr>`;
             } else {
@@ -2208,4 +2334,5 @@
         }
     </script>
 </body>
+
 </html>

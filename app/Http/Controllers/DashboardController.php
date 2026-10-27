@@ -52,23 +52,8 @@ class DashboardController extends Controller
         $vendors = Vendor::orderBy('name')->get();
         $items = Item::orderBy('name')->get();
 
-        $year = now()->year;
-
-        $maxPoSeq = PurchaseOrder::where('po_number', 'like', "PO-{$year}-%")
-            ->pluck('po_number')
-            ->map(function ($num) {
-                return preg_match('/-(\d+)$/', $num, $m) ? (int) $m[1] : 0;
-            })
-            ->max() ?? 0;
-        $nextPoNumber = sprintf('PO-%d-%04d', $year, $maxPoSeq + 1);
-
-        $maxPrSeq = PurchaseRequest::where('pr_number', 'like', "PR-{$year}-%")
-            ->pluck('pr_number')
-            ->map(function ($num) {
-                return preg_match('/-(\d+)$/', $num, $m) ? (int) $m[1] : 0;
-            })
-            ->max() ?? 0;
-        $nextPrNumber = sprintf('PR-%d-%04d', $year, $maxPrSeq + 1);
+        $nextPoNumber = PurchaseOrder::generateNextNumber();
+        $nextPrNumber = PurchaseRequest::generateNextNumber();
 
         return view('dashboard', compact(
             'stats',

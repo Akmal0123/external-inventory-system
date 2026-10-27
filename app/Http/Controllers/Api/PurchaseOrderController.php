@@ -163,7 +163,14 @@ class PurchaseOrderController extends Controller
             return $this->errorResponse('Akses ditolak: Silakan login terlebih dahulu untuk membuat Purchase Order.', 401);
         }
 
-        $validator = Validator::make($request->all(), [
+        $data = $request->all();
+        if (empty($data['po_number'])) {
+            $data['po_number'] = PurchaseOrder::generateNextNumber($data['order_date'] ?? null);
+        }
+        // Status awal untuk PO selalu 'draft' by default dan hanya dapat diupdate melalui status dokumen di AMS
+        $data['status'] = 'draft';
+
+        $validator = Validator::make($data, [
             'po_number' => 'required|string|max:50|unique:purchase_orders,po_number',
             'purchase_request_id' => 'nullable|exists:purchase_requests,id',
             'company_id' => 'required|exists:companies,id',
@@ -201,7 +208,7 @@ class PurchaseOrderController extends Controller
                 'company_id' => $validated['company_id'],
                 'vendor_id' => $validated['vendor_id'],
                 'order_date' => $validated['order_date'],
-                'status' => $validated['status'] ?? 'draft',
+                'status' => 'draft',
                 'description' => $validated['description'] ?? null,
                 'subtotal' => $subtotal,
                 'tax' => $tax,
@@ -223,7 +230,26 @@ class PurchaseOrderController extends Controller
             return $po->load(['company', 'vendor', 'purchaseRequest', 'items.item']);
         });
 
-        return $this->successResponse($this->transformPurchaseOrder($po), 'Purchase Order berhasil dibuat', 201);
+        // Trigger sinkronisasi otomatis ke AMS via microservice-lookup
+        $syncMeta = null;
+        try {
+            $lookupUrl = rtrim(config('services.lookup.url', env('LOOKUP_SERVICE_URL', 'http://localhost:5000')), '/');
+            $syncRes = \Illuminate\Support\Facades\Http::timeout(5)->post("{$lookupUrl}/api/v1/integration/sync/po", [
+                'po_number' => $po->po_number,
+            ]);
+            if ($syncRes->successful()) {
+                $syncMeta = $syncRes->json('data');
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Gagal auto-sync PO {$po->po_number} ke microservice: " . $e->getMessage());
+        }
+
+        $response = $this->transformPurchaseOrder($po);
+        if ($syncMeta) {
+            $response['sync_info'] = $syncMeta;
+        }
+
+        return $this->successResponse($response, 'Purchase Order berhasil dibuat dan disinkronisasikan ke microservice-lookup', 201);
     }
 
     /**
@@ -376,6 +402,43 @@ class PurchaseOrderController extends Controller
             'Content-Disposition' => 'inline; filename="' . $filename . '"',
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
+    }
+
+    /**
+     * Trigger manual sync of Purchase Order to AMS via microservice-lookup.
+     */
+    public function sync(Request $request, string $id): JsonResponse
+    {
+        $po = PurchaseOrder::with(['company', 'vendor', 'purchaseRequest', 'items.item'])->find($id);
+        if (!$po) {
+            $po = PurchaseOrder::where('po_number', $id)->first();
+        }
+
+        if (!$po) {
+            return $this->errorResponse('Purchase Order tidak ditemukan', 404);
+        }
+
+        if (!$this->isServiceOrAdmin($request)) {
+            $user = $this->resolveUser($request);
+            if (!$user || ($po->user_id !== null && $po->user_id !== $user->id)) {
+                return $this->errorResponse('Akses ditolak: Anda hanya dapat melakukan sync pada Purchase Order milik Anda sendiri.', 403);
+            }
+        }
+
+        try {
+            $lookupUrl = rtrim(config('services.lookup.url', env('LOOKUP_SERVICE_URL', 'http://localhost:5000')), '/');
+            $response = \Illuminate\Support\Facades\Http::timeout(10)->post("{$lookupUrl}/api/v1/integration/sync/po", [
+                'po_number' => $po->po_number,
+            ]);
+
+            if ($response->successful()) {
+                return $this->successResponse($response->json('data'), 'Sinkronisasi berhasil dijalankan oleh microservice-lookup');
+            }
+
+            return $this->errorResponse('Gagal melakukan sync: ' . ($response->json('error.message') ?? $response->body()), $response->status());
+        } catch (\Throwable $e) {
+            return $this->errorResponse('Gagal menghubungi microservice-lookup: ' . $e->getMessage(), 500);
+        }
     }
 
     /**

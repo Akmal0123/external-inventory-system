@@ -76,4 +76,32 @@ class PurchaseOrder extends Model
             'total' => $total,
         ]);
     }
+
+    /**
+     * Generate next PO number in format: TSPM/{YEAR}/{MONTH}/PO/{0001}
+     */
+    public static function generateNextNumber(?string $date = null): string
+    {
+        $targetDate = $date ? \Carbon\Carbon::parse($date) : now();
+        $year = $targetDate->format('Y');
+        $month = $targetDate->format('m');
+
+        $maxSeq = static::where('po_number', 'like', "TSPM/{$year}/{$month}/PO/%")
+            ->pluck('po_number')
+            ->map(function ($num) {
+                return preg_match('/\/PO\/(\d+)$/', $num, $m) ? (int) $m[1] : 0;
+            })
+            ->max();
+
+        if ($maxSeq === null || $maxSeq === false) {
+            $maxSeq = static::where('po_number', 'like', "TSPM/%/PO/%")
+                ->pluck('po_number')
+                ->map(function ($num) {
+                    return preg_match('/\/PO\/(\d+)$/', $num, $m) ? (int) $m[1] : 0;
+                })
+                ->max() ?? 0;
+        }
+
+        return sprintf('TSPM/%s/%s/PO/%04d', $year, $month, $maxSeq + 1);
+    }
 }
